@@ -72,6 +72,7 @@ func TestPathContains(t *testing.T) {
 	testPathContainsCase(t, true, "test", "foo/bar", false)
 	testPathContainsCase(t, true, "abc", "/abc", false)
 	testPathContainsCase(t, true, "/abc", "anything", true)
+	testPathContainsCase(t, true, "/test", "/", false)
 	testPathContainsCase(t, true, "/foo/Bar/baz", "/foo/bar/baz/joe", false)
 	testPathContainsCase(t, false, "/foo/Bar/baz", "/foo/bar/baz/joe", true)
 }

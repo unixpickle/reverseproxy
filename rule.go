@@ -16,6 +16,7 @@ type Rule struct {
 	
 	CaseSensitivePath bool `json:case_sensitive_path`
 	CaseSensitiveHost bool `json:case_sensitive_host`
+	CleanRequestPath  bool `json:clean_request_path`
 }
 
 func (r Rule) MatchesRequest(req *http.Request) bool {
@@ -26,11 +27,16 @@ func (r Rule) MatchesRequest(req *http.Request) bool {
 	} else if r.SourceHost != req.Host {
 		return false
 	}
-	// If the source path is not absolute, anything should match
+	
+	// If the source path is not absolute, anything should match. If the
+	// destination is relative but the source is absolute, it should not match.
+	reqPath := r.reqPath(req)
 	if !pathlib.IsAbs(r.SourcePath) {
 		return true
+	} else if !pathlib.IsAbs(reqPath) {
+		return false
 	}
-	return PathContains(r.SourcePath, req.URL.Path, r.CaseSensitivePath)
+	return PathContains(r.SourcePath, reqPath, r.CaseSensitivePath)
 }
 
 func (r Rule) DestinationURL(req *http.Request) url.URL {
@@ -38,11 +44,19 @@ func (r Rule) DestinationURL(req *http.Request) url.URL {
 	newURL.Scheme = r.DestScheme
 	newURL.Host = r.DestHost
 	
-	// Compute the new path
+	// Compute the new path if needed
 	if pathlib.IsAbs(r.SourcePath) {
-		rel := RelativePath(r.SourcePath, req.URL.Path, r.CaseSensitivePath)
+		rel := RelativePath(r.SourcePath, r.reqPath(req), r.CaseSensitivePath)
 		newURL.Path = pathlib.Join(r.DestPath, rel)
 	}
 	
 	return newURL
+}
+
+func (r Rule) reqPath(req *http.Request) string {
+	if r.CleanRequestPath {
+		return pathlib.Clean(req.URL.Path)
+	} else {
+		return req.URL.Path
+	}
 }
