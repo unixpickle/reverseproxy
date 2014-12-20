@@ -14,8 +14,8 @@ type Rule struct {
 	DestPath   string `json:dest_path`
 	DestScheme string `json:dest_scheme`
 	
-	CaseSensitivePath bool `json:case_sensitive_path`
 	CaseSensitiveHost bool `json:case_sensitive_host`
+	CaseSensitivePath bool `json:case_sensitive_path`
 	CleanRequestPath  bool `json:clean_request_path`
 }
 
