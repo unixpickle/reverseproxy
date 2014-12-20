@@ -47,7 +47,11 @@ func (r Rule) DestinationURL(req *http.Request) url.URL {
 	// Compute the new path if needed
 	if pathlib.IsAbs(r.SourcePath) {
 		rel := RelativePath(r.SourcePath, r.reqPath(req), r.CaseSensitivePath)
-		newURL.Path = pathlib.Join(r.DestPath, rel)
+		if len(r.DestPath) == 0 {
+			newURL.Path = "/" + rel
+		} else {
+			newURL.Path = pathlib.Join(r.DestPath, rel)
+		}
 	}
 	
 	return newURL
