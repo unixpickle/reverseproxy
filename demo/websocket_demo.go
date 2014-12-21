@@ -21,14 +21,13 @@ func main() {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	wsURL := "ws://localhost" + portString + "/ws"
 	index := `<!doctype html>
 <html>
 	<head>
 		<title>Websocket Demo</title>
 		<script type="text/javascript">
 		function loadHandler() {
-			var ws = new window.WebSocket("` + wsURL + `");
+			var ws = new window.WebSocket("ws://" + location.host + "/ws");
 			ws.onmessage = function(event) {
 				var msg = JSON.parse(event.data);
 				var text = msg['count'] + '';
@@ -46,7 +45,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print("Got websocket connection.")
-	upgrade := websocket.Upgrader{time.Minute, 0, 0, nil, nil, nil}
+	upgrade := websocket.Upgrader{time.Minute, 0, 0, nil, nil, acceptOrigin}
 	conn, err := upgrade.Upgrade(w, r, http.Header{})
 	if err != nil {
 		log.Print("WebSocket upgrade failed:", err)
@@ -85,4 +84,8 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Print("Websocket closed. There are ", len(connList), " clients.")
 	connLock.Unlock()
+}
+
+func acceptOrigin(r *http.Request) bool {
+	return true
 }

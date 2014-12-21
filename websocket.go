@@ -27,36 +27,43 @@ func ProxyWebsocket(w http.ResponseWriter, r *http.Request, rule *Rule) error {
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
 	
 	// Update the headers and send the request to the target
 	r.Header = RequestHeaders(r, true)
 	r.Host = destURL.Host
 	if err := r.Write(conn); err != nil {
+		conn.Close()
 		return err
 	}
 	
 	// Hijack the response and proxy data.
 	hjConn, hjStream, err := hj.Hijack()
 	if err != nil {
+		conn.Close()
 		return err
 	}
-	defer hjConn.Close()
-	BidirectionalPipe(hjStream, conn)
+	
+	BidirectionalPipe(hjStream, conn, func() {
+		hjStream.Flush()
+		conn.Close()
+		hjConn.Close()
+	})
 	
 	return nil
 }
 
-func BidirectionalPipe(a io.ReadWriter, b io.ReadWriter) {
+func BidirectionalPipe(a io.ReadWriter, b io.ReadWriter, closeBoth func()) {
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
 	go func() {
 		io.Copy(b, a)
-		wg.Add(-1)
+		closeBoth()
+		wg.Done()
 	}()
 	go func() {
 		io.Copy(a, b)
-		wg.Add(-1)
+		closeBoth()
+		wg.Done()
 	}()
 	wg.Wait()
 }
