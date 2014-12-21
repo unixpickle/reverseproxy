@@ -9,10 +9,11 @@ import (
 // ProxyHTTP proxies an HTTP request via a given rule.
 func ProxyHTTP(w http.ResponseWriter, r *http.Request, rule *Rule,
 	client *http.Client) error {
-	// Make sure the rule is applicable
+	// Make sure the rule is applicable.
 	if !rule.MatchesRequest(r) {
 		return errors.New("Request does not match rule.")
 	}
+	
 	// Generate the request
 	targetURL := rule.DestinationURL(r)
 	req, err := http.NewRequest(r.Method, targetURL.String(), r.Body)
