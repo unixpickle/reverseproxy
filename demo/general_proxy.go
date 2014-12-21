@@ -17,14 +17,19 @@ func main() {
 		log.Fatal("Usage: " + os.Args[0] + " <local port> <local path>" +
 			" <remote protocol> <remote host> <remote path>")
 	}
-	if n, err := strconv.Atoi(os.Args[1]); err != nil || n < 0 || n > 65535 {
-		log.Fatal("Invalid port number: " + os.Args[1])
+	localPort := os.Args[1]
+	localPath := os.Args[2]
+	remoteProtocol := os.Args[3]
+	remoteHost := os.Args[4]
+	remotePath := os.Args[5]
+	if n, err := strconv.Atoi(localPort); err != nil || n < 0 || n > 65535 {
+		log.Fatal("Invalid port number: " + localPort)
 	}
-	log.Print("Go to http://localhost:" + os.Args[1] + os.Args[2])
+	log.Print("Go to http://localhost:" + localPort + localPath)
 	handler := new(MyHandler)
-	handler.rule = reverseproxy.Rule{"localhost:" + os.Args[1], os.Args[2],
-		os.Args[4], os.Args[5], os.Args[3], false, true, false}
-	http.ListenAndServe(":"+os.Args[1], handler)
+	handler.rule = reverseproxy.Rule{"localhost:" + localPort, localPath,
+		remoteHost, remotePath, remoteProtocol, false, true, false}
+	http.ListenAndServe(":"+localPort, handler)
 }
 
 func (self MyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

@@ -20,7 +20,7 @@ func RequestHeaders(r *http.Request, ws bool) http.Header {
 	if r.URL.Scheme != "" {
 		forwarded["Proto"] = r.URL.Scheme
 	}
-	
+
 	// Old values remain in a comma-separated
 	for key, value := range forwarded {
 		header := "X-Forwarded-" + key
@@ -29,7 +29,7 @@ func RequestHeaders(r *http.Request, ws bool) http.Header {
 		}
 		result[header] = []string{value}
 	}
-	
+
 	return result
 }
 

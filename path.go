@@ -15,10 +15,10 @@ func PathComponents(path string) []string {
 	// such trickery)
 	for i := 0; i < len(comps); i++ {
 		if len(comps[i]) == 0 {
-			for j := i; j < len(comps) - 1; j++ {
-				comps[j] = comps[j + 1]
+			for j := i; j < len(comps)-1; j++ {
+				comps[j] = comps[j+1]
 			}
-			comps = comps[0:len(comps)-1]
+			comps = comps[0 : len(comps)-1]
 			i--
 		}
 	}
@@ -72,12 +72,12 @@ func RelativePath(from, to string, caseSensitive bool) string {
 	}
 	numDots := len(fromComps) - common
 	numComps := len(toComps) - common
-	res := make([]string, 0, numDots + numComps)
+	res := make([]string, 0, numDots+numComps)
 	for i := 0; i < numDots; i++ {
 		res = append(res, "..")
 	}
 	for i := 0; i < numComps; i++ {
-		res = append(res, toComps[common + i])
+		res = append(res, toComps[common+i])
 	}
 	return JoinComponents(res, false)
 }
