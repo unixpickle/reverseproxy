@@ -52,6 +52,9 @@ func ProxyWebsocket(w http.ResponseWriter, r *http.Request, rule *Rule) error {
 	return nil
 }
 
+// BidirectionalPipe pipes two io.ReadWriters into each other.
+// When one io.ReadWriter is closed, closeBoth() is called.
+// This method only returns once both streams have been closed.
 func BidirectionalPipe(a io.ReadWriter, b io.ReadWriter, closeBoth func()) {
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
