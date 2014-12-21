@@ -10,6 +10,10 @@ If you run [websocket_demo.go](websocket_demo.go) in one command-line window, yo
 
 Now the URL "http://localhost:1338/" should be equivalent to "http://localhost:1337/".
 
+**NOTE**: **websocket_demo.go** needs [Gorilla's websocket API](https://github.com/gorilla/websocket) to run correctly. You can download it with the following command:
+
+    go get github.com/gorilla/websocket
+
 ## Proxying Apple's website!
 
 My first test was to proxy "http://apple.com" to "http://localhost:1337"&mdash;it actually works surprisingly well.
