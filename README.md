@@ -46,10 +46,10 @@ The [demo](demo) folder contains a few programs which use this library. The fold
 
 **reverseproxy** is licensed under the BSD 2-clause license. See [LICENSE](LICENSE).
 
+```
 Copyright (c) 2014, Alex Nichol.
 All rights reserved.
 
-```
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
