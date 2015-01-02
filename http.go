@@ -8,7 +8,7 @@ import (
 
 // ProxyHTTP proxies an HTTP request via a given rule.
 func ProxyHTTP(w http.ResponseWriter, r *http.Request, rule *Rule,
-	client *http.Client) error {
+	rt http.RoundTripper) error {
 	// Make sure the rule is applicable.
 	if !rule.MatchesRequest(r) {
 		return errors.New("Request does not match rule.")
@@ -23,7 +23,7 @@ func ProxyHTTP(w http.ResponseWriter, r *http.Request, rule *Rule,
 	req.Header = RequestHeaders(r, false)
 
 	// Send the request
-	res, err := client.Do(req)
+	res, err := rt.RoundTrip(req)
 	if err != nil {
 		return err
 	}
