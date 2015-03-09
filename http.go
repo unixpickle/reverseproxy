@@ -1,41 +1,37 @@
 package reverseproxy
 
 import (
-	"errors"
 	"io"
 	"net/http"
 )
 
-// ProxyHTTP proxies an HTTP request via a given rule.
-func ProxyHTTP(w http.ResponseWriter, r *http.Request, rule *Rule,
-	rt http.RoundTripper) error {
-	// Make sure the rule is applicable.
-	if !rule.MatchesRequest(r) {
-		return errors.New("Request does not match rule.")
-	}
-
-	// Generate the request
-	targetURL := rule.DestinationURL(r)
+// ProxyHTTP proxies an HTTP request to a given destination host.
+// This will not handle WebSockets intelligently.
+func ProxyHTTP(w http.ResponseWriter, r *http.Request, host string) {
+	// Generate the request for the proxy destination.
+	targetURL := *r.URL
+	targetURL.Host = host
+	targetURL.Scheme = "http"
 	req, err := http.NewRequest(r.Method, targetURL.String(), r.Body)
 	if err != nil {
-		return err
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
 	}
-	req.Header = RequestHeaders(r, false)
+	req.Header = requestHeaders(r, host, false)
 
 	// Send the request
-	res, err := rt.RoundTrip(req)
+	res, err := http.DefaultTransport.RoundTrip(req)
 	if err != nil {
-		return err
+		http.Error(w, err.Error(), http.StatusBadGateway)
+		return
 	}
 
 	// Write the response
-	for header, value := range ResponseHeaders(res.Header, false) {
+	respHead := responseHeaders(res, r.URL.Host, r.URL.Scheme, false)
+	for header, value := range respHead {
 		w.Header()[header] = value
 	}
 	w.WriteHeader(res.StatusCode)
 	io.Copy(w, res.Body)
 	res.Body.Close()
-
-	// w is automatically closed by the server
-	return nil
 }

@@ -1,6 +1,6 @@
 # reverseproxy
 
-**reverseproxy** is a fully functional and configurable reverse HTTP proxy implementation for Go.
+**reverseproxy** is a lightweight HTTP reverse-proxy implementation.
 
 # Overview
 
@@ -8,7 +8,7 @@
 
 Reverse HTTP proxies are used for everything from load balancing to shared hosting. A reverse proxy transparently forwards connections from one server to another.
 
-Take an example. You might connect to my server through the URL [http://aqnichol.com](http://aqnichol.com), but my server uses a reverse proxy to forward that connection to http://localhost:8080. Even though an outside client cannot connect to that port on my server, the reverse proxy can. This allows me to run different server applications on different ports on my server and still server all of them through port 80.
+Take an example. You might connect to my server through the URL [http://aqnichol.com](http://aqnichol.com), but my server uses a reverse proxy to forward that connection to http://localhost:8080. Even though an outside client cannot connect to that port on my server, the reverse proxy can. This allows me to run different server applications on different ports on my server and still serve all of them through port 80.
 
 ## The API
 
@@ -47,7 +47,7 @@ The [demo](demo) folder contains a few programs which use this library. The fold
 **reverseproxy** is licensed under the BSD 2-clause license. See [LICENSE](LICENSE).
 
 ```
-Copyright (c) 2014, Alex Nichol.
+Copyright (c) 2014-2015, Alex Nichol.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
