@@ -12,35 +12,24 @@ Take an example. You might connect to my server through the URL [http://aqnichol
 
 ## The API
 
-With this API, you can forward an HTTP connection directly through a proxy. As can be seen in [demo/proxy_apple.go](demo/proxy_apple.go), the actual forwarding is one line of code:
+Documentation can be found at the [GoDoc](http://godoc.org/github.com/unixpickle/reverseproxy).
+
+With this API, you can forward an HTTP connection directly through a proxy. You can forward a request to a different host easily:
 
     func handler(w http.ResponseWriter, r *http.Request) {
-    	reverseproxy.Proxy(w, r, rule, false)
+    	reverseproxy.ProxyRequest(w, r, "somehost.com:8080")
     }
 
-The third argument, `rule`, is a `reverseproxy.Rule` object. This object has the following fields and can be easily created:
-
-    type Rule struct {
-    	SourceHost string `json:source_host`
-    	SourcePath string `json:source_path`
-    	DestHost   string `json:dest_host`
-    	DestPath   string `json:dest_path`
-    	DestScheme string `json:dest_scheme`
-
-    	CaseSensitiveHost bool `json:case_sensitive_host`
-    	CaseSensitivePath bool `json:case_sensitive_path`
-    	CleanRequestPath  bool `json:clean_request_path`
-    }
-
-Let it be noted that the `Rule` type includes annotations so that it can be serialized directly to JSON. While the reverseproxy library does not serialize `Rule` objects itself, a user may want to.
-
-# Extra features
-
-Most HTTP reverse proxies do not allow the target URL to have a path. For example, you could forward "aqnichol.com" to "localhost:1337", but you could not forward "aqnichol.com/foo" to "localhost:1337/bar". The reverseproxy API makes this is possible. However, this does have some caveats. Your HTML, JavaScript, and CSS code must understand that it is being proxied in an unusual way. For example, if you proxy "aqnichol.com/foo/bar" to "localhost:1337", the absolute path "/" will have a very different meaning on "localhost:1337" than it has on "aqnichol.com/foo/bar".
+For now, the target host can include a port number but not a protocol. The unencrypted HTTP protocol is always used.
 
 # Demonstrations
 
 The [demo](demo) folder contains a few programs which use this library. The folder also contains a [README](demo/README.md) with more detailed information on each demonstration.
+
+# TODO
+
+ * Add Proxy struct demonstration to README
+ * Rewrite host in "Location" header
 
 # License
 
