@@ -60,7 +60,7 @@ func (p *Proxy) RuleTable() RuleTable {
 func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Pick a host
 	p.lock.RLock()
-	rules, found := p.rules[r.URL.Host]
+	rules, found := p.rules[r.Host]
 	if !found {
 		// This is the "no forward rule" rule
 		rules, found = p.rules["*"]

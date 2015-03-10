@@ -45,7 +45,7 @@ func proxyHTTP(w http.ResponseWriter, r *http.Request, hosts []string,
 	}
 
 	// Write the response
-	respHead := responseHeaders(res, r.URL.Host, r.URL.Scheme, false)
+	respHead := responseHeaders(res, r.Host, r.URL.Scheme, false)
 	for header, value := range respHead {
 		w.Header()[header] = value
 	}
