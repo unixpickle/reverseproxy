@@ -10,6 +10,11 @@ import (
 // ProxyWebSocket proxies a WebSocket request to a given host.
 // This should only be used if the request had an "Upgrade: websocket" header.
 func ProxyWebSocket(w http.ResponseWriter, r *http.Request, host string) {
+	proxyWebSocket(w, r, []string{host}, []int{0})
+}
+
+func proxyWebSocket(w http.ResponseWriter, r *http.Request, hosts []string,
+	indices []int) {
 	// Make sure we can hijack the ResponseWriter.
 	hj, ok := w.(http.Hijacker)
 	if !ok {
@@ -17,8 +22,17 @@ func ProxyWebSocket(w http.ResponseWriter, r *http.Request, host string) {
 		return
 	}
 
-	// Open a raw connection to the destination host
-	conn, err := net.Dial("tcp", host)
+	// Open a raw connection to a destination host
+	var conn net.Conn
+	var err error
+	var host string
+	for _, i := range indices {
+		host = hosts[i]
+		conn, err = net.Dial("tcp", host)
+		if err == nil {
+			break
+		}
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
