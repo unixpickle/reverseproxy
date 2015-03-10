@@ -12,4 +12,11 @@ func ProxyRequest(w http.ResponseWriter, r *http.Request, host string) {
 	}
 }
 
-
+func proxyRequest(w http.ResponseWriter, r *http.Request, hosts []string,
+	indices []int) {
+	if r.Header.Get("Upgrade") == "websocket" {
+		proxyWebSocket(w, r, hosts, indices)
+	} else {
+		proxyHTTP(w, r, hosts, indices)
+	}
+}

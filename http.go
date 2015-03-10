@@ -31,6 +31,9 @@ func proxyHTTP(w http.ResponseWriter, r *http.Request, hosts []string,
 
 		// Send the request
 		res, err = http.DefaultTransport.RoundTrip(req)
+		// If an error occurs the request's body may have been read and trying a
+		// new host would be pointless. However, I do not currently check for
+		// this.
 		if err != nil {
 			continue
 		}
