@@ -28,6 +28,7 @@ func proxyHTTP(w http.ResponseWriter, r *http.Request, hosts []string,
 			continue
 		}
 		req.Header = requestHeaders(r, host, false)
+		req.Host = r.Host
 
 		// Send the request
 		res, err = http.DefaultTransport.RoundTrip(req)
