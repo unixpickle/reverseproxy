@@ -30,9 +30,6 @@ func proxyHTTP(w http.ResponseWriter, r *http.Request, hosts []string,
 		req.Header = requestHeaders(r, host, false)
 		req.Host = r.Host
 
-		// NOTE: this is necessary because some servers (i.e. Apache) use gzip.
-		req.Header.Set("Accept-Encoding", "identity")
-
 		// Send the request
 		res, err = http.DefaultTransport.RoundTrip(req)
 		// If an error occurs the request's body may have been read and trying a
