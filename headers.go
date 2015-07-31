@@ -30,8 +30,6 @@ func requestHeaders(r *http.Request, host string, ws bool) http.Header {
 		result[header] = []string{value}
 	}
 
-	// TODO: rewrite the Host header if possible
-
 	return result
 }
 

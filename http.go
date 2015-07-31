@@ -28,6 +28,7 @@ func proxyHTTP(w http.ResponseWriter, r *http.Request, hosts []string,
 			continue
 		}
 		req.Header = requestHeaders(r, host, false)
+		req.Host = r.Host
 
 		// NOTE: this is necessary because some servers (i.e. Apache) use gzip.
 		req.Header.Set("Accept-Encoding", "identity")
