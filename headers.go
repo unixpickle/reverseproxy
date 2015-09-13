@@ -1,6 +1,9 @@
 package reverseproxy
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 // requestHeaders adds "x-forwarded-*" headers to a request while removing
 // hop-by-hop headers.
@@ -15,8 +18,8 @@ func requestHeaders(r *http.Request, host string, ws bool) http.Header {
 	}
 
 	// Get the specific forwarded headers for this hop.
-	forwarded := map[string]string{"For": r.RemoteAddr, "Host": r.Host,
-		"Proto": "http"}
+	forwarded := map[string]string{"For": extractRemoteIP(r.RemoteAddr),
+		"Host": r.Host, "Proto": "http"}
 	if r.URL.Scheme != "" {
 		forwarded["Proto"] = r.URL.Scheme
 	}
@@ -50,6 +53,17 @@ func responseHeaders(r *http.Response, host, scheme string,
 	// TODO: rewrite the Host header if possible
 
 	return result
+}
+
+// extractRemoteIP takes out the port number from a RemoteAddr.
+func extractRemoteIP(remoteAddr string) string {
+	if strings.HasPrefix(remoteAddr, "[") {
+		// Extract IPv6 addresses from "[addr]:port"
+		return strings.Split(remoteAddr[1:], "]")[0]
+	} else {
+		// Extract IPv4 addresses from "addr:port"
+		return strings.Split(remoteAddr, ":")[0]
+	}
 }
 
 // isHopByHop checks if a header is a hop-by-hop header that should be removed
