@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+var transport *http.Transport = &http.Transport{DisableKeepAlives: true}
+
 // ProxyHTTP proxies an HTTP request to a given destination host.
 // This will not handle WebSockets intelligently.
 func ProxyHTTP(w http.ResponseWriter, r *http.Request, host string) {
@@ -31,7 +33,7 @@ func proxyHTTP(w http.ResponseWriter, r *http.Request, hosts []string,
 		req.Host = r.Host
 
 		// Send the request
-		res, err = http.DefaultTransport.RoundTrip(req)
+		res, err = transport.RoundTrip(req)
 		// If an error occurs the request's body may have been read and trying a
 		// new host would be pointless. However, I do not currently check for
 		// this.
