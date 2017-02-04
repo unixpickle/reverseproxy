@@ -1,6 +1,7 @@
 package reverseproxy
 
 import (
+	"bufio"
 	"io"
 	"net"
 	"net/http"
@@ -54,7 +55,7 @@ func proxyWebSocket(w http.ResponseWriter, r *http.Request, hosts []string,
 		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}
-	bidirectionalPipe(hjStream, conn, func() {
+	bidirectionalPipe(&flushWriter{hjStream}, conn, func() {
 		hjStream.Flush()
 		conn.Close()
 		hjConn.Close()
@@ -78,4 +79,21 @@ func bidirectionalPipe(a io.ReadWriter, b io.ReadWriter, closeBoth func()) {
 		wg.Done()
 	}()
 	wg.Wait()
+}
+
+type flushWriter struct {
+	b *bufio.ReadWriter
+}
+
+func (f *flushWriter) Read(buf []byte) (int, error) {
+	return f.b.Read(buf)
+}
+
+func (f *flushWriter) Write(b []byte) (n int, err error) {
+	n, err = f.b.Write(b)
+	err1 := f.b.Flush()
+	if err == nil {
+		err = err1
+	}
+	return
 }
