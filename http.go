@@ -53,6 +53,22 @@ func proxyHTTP(w http.ResponseWriter, r *http.Request, hosts []string,
 		w.Header()[header] = value
 	}
 	w.WriteHeader(res.StatusCode)
-	io.Copy(w, res.Body)
+	if respHead.Get("X-Content-Type-Options") == "nosniff" {
+		// This header tends to be set for chunked/streaming responses.
+		io.Copy(&httpFlushWriter{w: w, f: w.(http.Flusher)}, res.Body)
+	} else {
+		io.Copy(w, res.Body)
+	}
 	res.Body.Close()
+}
+
+type httpFlushWriter struct {
+	w io.Writer
+	f http.Flusher
+}
+
+func (h *httpFlushWriter) Write(buf []byte) (int, error) {
+	n, err := h.w.Write(buf)
+	h.f.Flush()
+	return n, err
 }
